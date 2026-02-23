@@ -24,3 +24,29 @@ extra/exe-builder/obj
 
 .vs
 .vscode
+
+# --- Terraform ---
+
+.terraform/
+
+
+*.tfstate
+*.tfstate.*
+
+
+*.tfvars
+*.tfvars.json
+
+# --- Sistema y Logs ---
+# Archivos de log de errores
+*.log
+
+# Archivos temporales de sistema
+.DS_Store
+Thumbs.db
+
+# --- Docker ---
+
+logs/
+*.image
+*.tar
