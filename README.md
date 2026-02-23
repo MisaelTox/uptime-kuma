@@ -51,4 +51,5 @@ The infrastructure consists of:
 * **Network Routing:** Configured Internet Gateways and Route Tables within the VPC module to enable public access to the service.
 
 ---
-*This project is a fork of the original Uptime Kuma, customized with a full AWS Cloud Infrastructure stack.*
+---
+*Note: This project is a fork of [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma). I have added the Terraform infrastructure layer to automate its deployment on AWS.*
