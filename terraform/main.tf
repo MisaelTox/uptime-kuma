@@ -85,8 +85,8 @@ resource "aws_ecs_task_definition" "kuma_task" {
   execution_role_arn       = aws_iam_role.ecs_role.arn
 
   container_definitions = jsonencode([{
-    name  = "uptime-kuma"
-    image = "louislam/uptime-kuma:1"
+    name         = "uptime-kuma"
+    image        = "louislam/uptime-kuma:1"
     portMappings = [{ containerPort = 3001, hostPort = 3001 }]
     mountPoints  = [{ containerPath = "/app/data", sourceVolume = "kuma-storage" }]
     logConfiguration = {
@@ -108,11 +108,11 @@ resource "aws_ecs_task_definition" "kuma_task" {
 }
 
 resource "aws_ecs_service" "kuma_service" {
-  name            = "kuma_service"
-  cluster         = aws_ecs_cluster.kuma_cluster.id
-  task_definition = aws_ecs_task_definition.kuma_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                              = "kuma_service"
+  cluster                           = aws_ecs_cluster.kuma_cluster.id
+  task_definition                   = aws_ecs_task_definition.kuma_task.arn
+  desired_count                     = 1
+  launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 300 # Le damos 5 minutos para arrancar
 
   network_configuration {
@@ -143,7 +143,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
 resource "aws_iam_role" "ecs_role" {
   name = "kuma_ecs_role"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [{ Action = "sts:AssumeRole", Effect = "Allow", Principal = { Service = "ecs-tasks.amazonaws.com" } }]
   })
 }
@@ -155,4 +155,20 @@ resource "aws_iam_role_policy_attachment" "ecs_policy" {
 
 resource "aws_cloudwatch_log_group" "kuma_logs" {
   name = "/ecs/kuma"
+}
+
+# ECR Repository para la imagen Docker de Uptime Kuma
+resource "aws_ecr_repository" "uptime_kuma" {
+  name                 = "uptime-kuma"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Project     = "uptime-kuma"
+    ManagedBy   = "terraform"
+    Environment = "production"
+  }
 }
