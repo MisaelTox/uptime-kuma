@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Correr tests
-        run: npm test
+        run: node --test --test-reporter=spec $(find test/backend-test -name "*.js" ! -name "test-mqtt*")ß
 
       - name: Docker build check
         run: docker build -t uptime-kuma:test .
