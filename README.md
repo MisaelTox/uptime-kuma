@@ -1,6 +1,6 @@
 # AWS Cloud Infrastructure for Uptime Kuma
 
-![CI/CD](https://github.com/MisaelTox/uptime-kuma/actions/workflows/ci-cd.yml/badge.svg)
+![CI/CD](https://github.com/MisaelTox/uptime-kuma/actions/workflows/ci-cd.yml/badge.svg?branch=main)
 ![AWS](https://img.shields.io/badge/AWS-ECS%20Fargate-orange?logo=amazon-aws)
 ![Terraform](https://img.shields.io/badge/IaC-Terraform-purple?logo=terraform)
 ![Node.js](https://img.shields.io/badge/Tests-Node.js-green?logo=node.js)
