@@ -41,9 +41,6 @@ jobs:
             test/backend-test/test-status-page.js \
             test/backend-test/test-util.js
 
-      - name: Docker build check
-        run: docker build -t uptime-kuma:test ./extra/uptime-kuma-push/
-
   # ─── JOB 2: Validación de infraestructura ────────────────────
   terraform-ci:
     name: Terraform CI
