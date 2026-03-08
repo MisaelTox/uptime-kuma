@@ -37,6 +37,11 @@ extra/exe-builder/obj
 *.tfvars
 *.tfvars.json
 
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
 # --- Sistema y Logs ---
 # Archivos de log de errores
 *.log
