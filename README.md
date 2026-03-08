@@ -47,7 +47,7 @@ AWS credentials are stored as **GitHub Secrets** — never hardcoded.
 
 ## 📸 Dashboard Preview
 
-*(My active monitoring dashboard showing real-time service status)*
+![Uptime Kuma Dashboard](img/kumademo.png)
 
 ---
 
