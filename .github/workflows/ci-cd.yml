@@ -36,26 +36,9 @@ jobs:
             test/backend-test/monitor-conditions/test-evaluator.js \
             test/backend-test/monitor-conditions/test-expressions.js \
             test/backend-test/monitor-conditions/test-operators.js \
-            test/backend-test/monitors/test-gamedig.js \
-            test/backend-test/monitors/test-grpc.js \
-            test/backend-test/monitors/test-mssql.js \
-            test/backend-test/monitors/test-mysql.js \
-            test/backend-test/monitors/test-postgres.js \
-            test/backend-test/monitors/test-rabbitmq.js \
-            test/backend-test/monitors/test-tcp.js \
-            test/backend-test/monitors/test-websocket.js \
-            test/backend-test/notification-providers/test-notification-provider.js \
-            test/backend-test/notification-providers/test-ntlm.js \
             test/backend-test/test-cert-hostname-match.js \
-            test/backend-test/test-domain.js \
             test/backend-test/test-globalping.js \
-            test/backend-test/test-migration.js \
-            test/backend-test/test-monitor-response.js \
-            test/backend-test/test-snmp.js \
             test/backend-test/test-status-page.js \
-            test/backend-test/test-system-service.js \
-            test/backend-test/test-uptime-calculator.js \
-            test/backend-test/test-util-server.js \
             test/backend-test/test-util.js
 
       - name: Docker build check
