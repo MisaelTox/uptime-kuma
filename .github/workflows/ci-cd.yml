@@ -42,7 +42,7 @@ jobs:
             test/backend-test/test-util.js
 
       - name: Docker build check
-        run: docker build -t uptime-kuma:test .
+        run: docker build -t uptime-kuma:test ./extra/uptime-kuma-push/
 
   # ─── JOB 2: Validación de infraestructura ────────────────────
   terraform-ci:
@@ -110,8 +110,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} .
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} ./extra/uptime-kuma-push/
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./extra/uptime-kuma-push/
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
