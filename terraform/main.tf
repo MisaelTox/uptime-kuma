@@ -2,10 +2,10 @@ provider "aws" {
   region = var.region
 }
 
-# --- REDES ---
+# --- Networking ---
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0" # Es buena práctica fijar la versión
+  version = "~> 5.0" # Pinning version is recommended
 
   name = "uptime_kuma_vpc"
   cidr = "10.1.0.0/16"
@@ -13,12 +13,12 @@ module "vpc" {
   azs            = ["${var.region}a", "${var.region}b"]
   public_subnets = ["10.1.1.0/24", "10.1.2.0/24"]
 
-  # ESTO ES LO QUE FALTA PARA QUE LA IP FUNCIONE:
+  # Required for public IP assignment
   create_igw         = true
-  enable_nat_gateway = false # No lo necesitas para esto y cuesta dinero
+  enable_nat_gateway = false # NAT Gateway not needed here, saves cost
 }
 
-# --- ALMACENAMIENTO (EFS) ---
+# --- Storage (EFS) ---
 resource "aws_efs_file_system" "kuma_data" {
   creation_token = "kuma-data"
   tags           = { Name = "UptimeKumaData" }
@@ -31,12 +31,12 @@ resource "aws_efs_mount_target" "kuma_mount" {
   security_groups = [aws_security_group.kuma_sg.id]
 }
 
-# --- SEGURIDAD ---
+# --- Security ---
 resource "aws_security_group" "kuma_sg" {
   name   = "kuma_sg"
   vpc_id = module.vpc.vpc_id
 
-  # Regla para la web
+  # Allow web traffic
   ingress {
     from_port   = 3001
     to_port     = 3001
@@ -44,12 +44,12 @@ resource "aws_security_group" "kuma_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # NUEVA REGLA: Permite que el contenedor hable con el disco EFS
+  # Allow EFS communication within the security group
   ingress {
     from_port = 2049
     to_port   = 2049
     protocol  = "tcp"
-    self      = true # Esto permite que los recursos con este mismo SG se hablen entre sí
+    self      = true # Allows resources sharing this SG to communicate
   }
 
   egress {
@@ -60,7 +60,7 @@ resource "aws_security_group" "kuma_sg" {
   }
 }
 
-# --- NOTIFICACIONES (SNS) ---
+# --- Notifications (SNS) ---
 resource "aws_sns_topic" "alerts" {
   name = "kuma-alerts"
 }
@@ -71,7 +71,7 @@ resource "aws_sns_topic_subscription" "email" {
   endpoint  = var.user_email
 }
 
-# --- CÓMPUTO (ECS FARGATE) ---
+# --- Compute (ECS Fargate) ---
 resource "aws_ecs_cluster" "kuma_cluster" {
   name = "kuma_cluster"
 }
@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "kuma_task" {
   family                   = "kuma-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = "256" # Más pequeño = más barato
+  cpu                      = "256" # Smaller = cheaper
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_role.arn
 
@@ -113,7 +113,7 @@ resource "aws_ecs_service" "kuma_service" {
   task_definition                   = aws_ecs_task_definition.kuma_task.arn
   desired_count                     = 1
   launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 300 # Le damos 5 minutos para arrancar
+  health_check_grace_period_seconds = 300 # Allow 5 minutes for the container to start
 
   network_configuration {
     subnets          = module.vpc.public_subnets
@@ -122,7 +122,7 @@ resource "aws_ecs_service" "kuma_service" {
   }
 }
 
-# --- MONITOREO (ALERTA DE CPU) ---
+# --- Monitoring (CPU Alert) ---
 resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   alarm_name          = "Kuma-High-CPU"
   comparison_operator = "GreaterThanThreshold"
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_alarm" {
   }
 }
 
-# (Roles IAM abreviados, usa los mismos que en el de Minecraft)
+# IAM Roles for ECS task execution
 resource "aws_iam_role" "ecs_role" {
   name = "kuma_ecs_role"
   assume_role_policy = jsonencode({
@@ -157,7 +157,7 @@ resource "aws_cloudwatch_log_group" "kuma_logs" {
   name = "/ecs/kuma"
 }
 
-# ECR Repository para la imagen Docker de Uptime Kuma
+# ECR Repository for Uptime Kuma Docker image
 resource "aws_ecr_repository" "uptime_kuma" {
   name                 = "uptime-kuma"
   image_tag_mutability = "MUTABLE"

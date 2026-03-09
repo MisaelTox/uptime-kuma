@@ -1,9 +1,11 @@
 variable "region" {
-  default = "eu-north-1" # Estocolmo (puedes cambiarla)
+  description = "AWS region where resources will be deployed"
+  type        = string
+  default     = "eu-north-1"
 }
 
 variable "user_email" {
-  description = "Tu correo para recibir alertas de CloudWatch"
+  description = "Email address to receive CloudWatch alerts"
   type        = string
-  default     = "tu-correo@ejemplo.com" # CAMBIA ESTO
+  default     = "your-email@example.com"
 }
