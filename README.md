@@ -1,80 +1,66 @@
 # AWS Cloud Infrastructure for Uptime Kuma
 
-![CI/CD](https://github.com/MisaelTox/uptime-kuma/actions/workflows/ci-cd.yml/badge.svg?branch=main)
-![AWS](https://img.shields.io/badge/AWS-ECS%20Fargate-orange?logo=amazon-aws)
-![Terraform](https://img.shields.io/badge/IaC-Terraform-purple?logo=terraform)
-![Node.js](https://img.shields.io/badge/Tests-Node.js-green?logo=node.js)
+This project deploys a highly available **Uptime Kuma** instance on **AWS Fargate (ECS)** using **Terraform**. It features persistent storage, automated monitoring, and an email notification system.
 
-This project deploys a highly available **Uptime Kuma** instance on **AWS ECS Fargate** using **Terraform**, with a fully automated CI/CD pipeline via **GitHub Actions**.
+## 🚀 Project Overview
 
----
+The goal of this project was to move from a basic container deployment to a production-ready cloud architecture. I implemented a persistent data layer using **Amazon EFS** to ensure that monitoring data is never lost, even if the container restarts.
 
-## 🏗️ Architecture
+### Key Features
 
-| Component | Technology |
-|-----------|-----------|
-| Compute | AWS ECS Fargate |
-| Storage | Amazon EFS (mounted to `/app/data`) |
-| Networking | Custom VPC, 2 public subnets across AZs |
-| Monitoring | CloudWatch + SNS email alerts |
-| IaC | Terraform |
-| CI/CD | GitHub Actions |
+* **Serverless Computing:** Run on AWS Fargate (No EC2 instances to manage).
+* **Persistent Storage:** Amazon EFS integration for database persistence.
+* **Security:** Isolated VPC with specific Security Group rules (Port 3001 for Web, 2049 for EFS).
+* **Infrastructure as Code:** 100% managed via Terraform.
+* **Alerting:** Integrated with Amazon SNS for email notifications.
 
----
+## 🏗 Architecture Diagram
 
-## 🔄 CI/CD Pipeline
+![Uptime Kuma Diagram](img/kuma-arc.drawio.png)
 
-Every push to `main` automatically triggers two parallel jobs:
-```
-Push to main
-      ↓
-✅ App CI (parallel)         ✅ Terraform CI (parallel)
-   → npm install                → terraform fmt
-   → backend tests              → terraform validate
-                                → terraform plan → AWS
-      ↓                              ↓
-      └──────────── both pass ───────┘
-                      ↓
-           ⏸️ Manual approval gate
-                      ↓
-            🚀 Deploy to Production
-               → terraform apply
-```
 
-AWS credentials are stored as **GitHub Secrets** — never hardcoded.
 
----
+The infrastructure consists of:
+
+1. **VPC:** 2 Public Subnets across different Availability Zones.
+2. **ECS Fargate:** Task definition optimized for performance and cost.
+3. **EFS:** Elastic File System mounted to `/app/data` inside the container.
+4. **CloudWatch & SNS:** CPU usage monitoring and email alerts.
 
 ## 📸 Dashboard Preview
 
 ![Uptime Kuma Dashboard](img/kumademo.png)
+*(My active monitoring dashboard showing real-time service status)*
 
 ---
 
-## 🛠️ Deployment Instructions
+## 🛠 Deployment Instructions
 
 ### Prerequisites
-- Terraform installed
-- AWS CLI configured
+
+* Terraform installed.
+* AWS CLI configured with appropriate credentials.
 
 ### Steps
-```bash
-cd terraform
-terraform init
-terraform apply
-```
 
-Access the dashboard at `http://<TASK_IP>:3001` — get the Task Public IP from the ECS console.
+1. **Initialize Terraform:**
 
----
+   ```
+   terraform init
+   ```
+2. **Apply Configuration:**
+
+   ```
+   terraform apply
+   ```
+3. **Access the Dashboard:**
+   Get the Public IP from the ECS Task console and open `http://<TASK_IP>:3001` in your browser.
 
 ## 📝 Lessons Learned
 
-- **CI/CD with GitHub Actions** — parallel CI jobs for app tests and infrastructure validation, with a manual approval gate before any AWS changes
-- **Flaky test management** — identified and excluded infrastructure-dependent tests (MQTT, database) from CI, running only self-contained tests reliably
-- **EFS Connectivity** — resolved `ResourceInitializationError` by opening port 2049 in the Security Group for Fargate-to-EFS communication
-- **Network Routing** — configured Internet Gateways and Route Tables within the VPC module for public access
+* **EFS Connectivity:** Resolved `ResourceInitializationError` by opening port 2049 in the Security Group to allow communication between the Fargate task and the file system.
+* **Network Routing:** Configured Internet Gateways and Route Tables within the VPC module to enable public access to the service.
 
 ---
 
-*Fork of [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma). Terraform infrastructure layer and CI/CD pipeline added for AWS cloud deployment.*
+*Note: This project is a fork of [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma). I have added the Terraform infrastructure layer to automate its deployment on AWS.*
