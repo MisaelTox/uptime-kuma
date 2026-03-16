@@ -6,8 +6,8 @@ resource "aws_s3_bucket" "tfstate" {
   bucket = "misaeltox-uptime-kuma-tfstate"
 
   tags = {
-    Project     = "uptime-kuma"
-    ManagedBy   = "terraform"
+    Project   = "uptime-kuma"
+    ManagedBy = "terraform"
   }
 }
 
