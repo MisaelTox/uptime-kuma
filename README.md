@@ -114,3 +114,40 @@ A GitHub Actions workflow runs automatically on every push to `main` and on pull
 ---
 
 *Note: This project is a fork of [louislam/uptime-kuma](https://github.com/louislam/uptime-kuma). I have added the Terraform infrastructure layer to automate its deployment on AWS.*
+
+## ☸️ Kubernetes Deployment
+
+This project includes a full Kubernetes deployment in addition to the AWS Fargate setup.
+
+### Structure
+- `k8s/manifests/` — Raw Kubernetes manifests (Deployment, Service, PVC, ConfigMap, Ingress)
+- `k8s/helm/` — Helm chart for multi-environment deployments
+- `k8s/terraform/` — EKS cluster provisioning with Terraform
+
+### Quick Start (local)
+```bash
+# Start minikube
+minikube start
+
+# Create namespace
+kubectl create namespace monitoring
+
+# Deploy with Helm
+helm install uptime-kuma ./k8s/helm -n monitoring
+
+# Access the app
+kubectl port-forward service/uptime-kuma 3001:3001 -n monitoring
+```
+
+### Production (AWS EKS)
+```bash
+# Provision EKS cluster
+cd k8s/terraform && terraform init && terraform apply
+
+# Configure kubectl
+aws eks update-kubeconfig --region eu-central-1 --name uptime-kuma-cluster
+
+# Deploy with Helm
+kubectl create namespace monitoring
+helm install uptime-kuma ./k8s/helm -n monitoring
+```
