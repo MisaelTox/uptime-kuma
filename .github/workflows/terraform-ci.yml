@@ -1,4 +1,4 @@
-name: Terraform CI
+name: Infrastructure CI
 
 on:
   push:
@@ -7,25 +7,37 @@ on:
     branches: [main]
 
 jobs:
-  validate:
-    name: Format & Validate
+  terraform-fargate:
+    name: Terraform (Fargate)
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check -recursive
+        working-directory: terraform
+      - run: terraform init -backend=false
+        working-directory: terraform
+      - run: terraform validate
         working-directory: terraform
 
-      - name: Terraform Init
-        run: terraform init -backend=false
-        working-directory: terraform
+  terraform-eks:
+    name: Terraform (EKS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check -recursive
+        working-directory: k8s/terraform
+      - run: terraform init -backend=false
+        working-directory: k8s/terraform
+      - run: terraform validate
+        working-directory: k8s/terraform
 
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: terraform
+  helm:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: helm lint k8s/helm
+      - run: helm template test k8s/helm --set secret.appPassword=ci-dummy
