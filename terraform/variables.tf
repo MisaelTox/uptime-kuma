@@ -7,5 +7,4 @@ variable "region" {
 variable "user_email" {
   description = "Email address to receive CloudWatch alerts"
   type        = string
-  default     = "your-email@example.com"
 }
