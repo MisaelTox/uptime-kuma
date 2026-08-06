@@ -56,7 +56,8 @@ Custom-authored Helm chart for parameterized, multi-environment deployments.
 - Templated Deployment, Service, Ingress, PVC
 
 ```bash
-helm install uptime-kuma ./k8s/helm -n monitoring
+
+helm install uptime-kuma ./k8s/helm -n monitoring --set secret.appPassword=<your-password>
 ```
 
 ### 4. EKS Cluster on AWS (Terraform)
@@ -66,7 +67,7 @@ Live EKS cluster provisioned in `eu-central-1` via Terraform. Deployed and valid
 ```bash
 cd k8s/terraform && terraform init && terraform apply
 aws eks update-kubeconfig --region eu-central-1 --name uptime-kuma-cluster
-helm install uptime-kuma ./k8s/helm -n monitoring
+helm install uptime-kuma ./k8s/helm -n monitoring --set secret.appPassword=<your-password>
 ```
 
 ---
@@ -120,7 +121,7 @@ cd .. && terraform init && terraform apply
 ```bash
 minikube start
 kubectl create namespace monitoring
-helm install uptime-kuma ./k8s/helm -n monitoring
+helm install uptime-kuma ./k8s/helm -n monitoring --set secret.appPassword=<your-password> 
 kubectl port-forward service/uptime-kuma 3001:3001 -n monitoring
 ```
 
@@ -130,7 +131,7 @@ kubectl port-forward service/uptime-kuma 3001:3001 -n monitoring
 cd k8s/terraform && terraform init && terraform apply
 aws eks update-kubeconfig --region eu-central-1 --name uptime-kuma-cluster
 kubectl create namespace monitoring
-helm install uptime-kuma ./k8s/helm -n monitoring
+helm install uptime-kuma ./k8s/helm -n monitoring --set secret.appPassword=<your-password> 
 ```
 
 ---
