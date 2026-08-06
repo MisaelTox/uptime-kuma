@@ -21,6 +21,7 @@ module "vpc" {
 # --- Storage (EFS) ---
 resource "aws_efs_file_system" "kuma_data" {
   creation_token = "kuma-data"
+  encrypted      = true
   tags           = { Name = "UptimeKumaData" }
 }
 
@@ -108,12 +109,11 @@ resource "aws_ecs_task_definition" "kuma_task" {
 }
 
 resource "aws_ecs_service" "kuma_service" {
-  name                              = "kuma_service"
-  cluster                           = aws_ecs_cluster.kuma_cluster.id
-  task_definition                   = aws_ecs_task_definition.kuma_task.arn
-  desired_count                     = 1
-  launch_type                       = "FARGATE"
-  health_check_grace_period_seconds = 300 # Allow 5 minutes for the container to start
+  name            = "kuma_service"
+  cluster         = aws_ecs_cluster.kuma_cluster.id
+  task_definition = aws_ecs_task_definition.kuma_task.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
 
   network_configuration {
     subnets          = module.vpc.public_subnets
